@@ -41,3 +41,13 @@ for file_path in DATA_FOLDER.glob("quiz_*_grades.csv"):
         usecols=["Email", "Grade"],
     ).rename(columns={"Grade": quiz_name})
     quiz_grades = pd.concat([quiz_grades, quiz], axis=1)
+
+final_data = pd.merge(
+    roster, hw_exam_grades, left_index=True, right_index=True
+)
+
+final_data = pd.merge(
+    final_data, quiz_grades, left_on="Email Address", right_index=True
+)
+
+final_data = final_data.fillna(0)
