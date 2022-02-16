@@ -14,6 +14,8 @@ to calculate final grades for a class.
 from pathlib import Path
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import scipy.stats
 
 HERE = Path(__file__).parent
 DATA_FOLDER = HERE / "data"
@@ -55,7 +57,7 @@ final_data = final_data.fillna(0)
 
 n_exams = 3
 for n in range(1, n_exams + 1):
-    final_data[f"Exam {n} score"] = (
+    final_data[f"Exam {n} Score"] = (
         final_data[f"Exam {n}"] / final_data[f"Exam {n} - Max Points"]
     )
 
@@ -126,3 +128,20 @@ for section, table in final_data.groupby("Section"):
         f"file {section_file}."
     )
     table.sort_values(by=["Last Name", "First Name"]).to_csv(section_file)
+
+grade_counts = final_data["Final Grade"].value_counts().sort_index()
+grade_counts.plot.bar()
+plt.show()
+
+final_data["Final Score"].plot.hist(bins=20, label="Histogram")
+final_data["Final Score"].plot.density(
+    linewidth=4, label="Kernel Density Estimate"
+)
+
+final_mean = final_data["Final Score"].mean()
+final_std = final_data["Final Score"].std()
+x = np.linspace(final_mean - 5 * final_std, final_mean + 5 * final_std, 200)
+normal_dist = scipy.stats.norm.pdf(x, loc=final_mean, scale=final_std)
+plt.plot(x, normal_dist, label="Normal Distribution", linewidth=4)
+plt.legend()
+plt.show()
